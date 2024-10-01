@@ -1,5 +1,4 @@
-import type { WebSocketHandler as BunWSHandler, ServerWebSocket } from 'bun';
-import type { Server } from 'bun';
+import type { WebSocketHandler as BunWSHandler, Server, ServerWebSocket } from 'bun';
 
 export type CreateFetchOptions = {
     overrideOrigin?: string;
@@ -159,3 +158,7 @@ export type ResolvedStatic = [
     headers: [modified: string, etag: string, size: number],
     compression: [gzip: false | number, brotli: false | number]
 ];
+
+export interface MimeTypes {
+    [key: string]: string;
+}

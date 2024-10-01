@@ -1,8 +1,11 @@
-import type { AdapterPlatform, ServeOptions, WebSocketHandler } from '../types';
-import { get_basepath, get_url, set_url } from './utils';
-import { serve_static } from './static';
 import type { Server } from 'bun';
+import { existsSync } from 'fs';
+import { manifest } from 'MANIFEST';
+import { join } from 'path';
+import type { AdapterPlatform, ServeOptions, WebSocketHandler } from '../types';
 import { server } from './server';
+import sirv from './sirv';
+import { get_basepath, get_url, set_url } from './utils';
 
 type MaybePromise<T> = T | Promise<T>;
 
@@ -71,6 +74,25 @@ function resolve_xff_ip(request: Request, depth: number) {
     return ips.at(-depth) || undefined;
 }
 
+function serve(path: string, client = false) {
+    if (!existsSync(path)) {
+        return;
+    }
+    return sirv(path, {
+        etag: true,
+        gzip: true,
+        brotli: true,
+        setHeaders: client
+            ? (headers, pathname) => {
+                  if (pathname.startsWith(`/${manifest.appDir}/immutable/`)) {
+                      headers.set('cache-control', 'public,max-age=31536000,immutable');
+                  }
+                  return headers;
+              }
+            : undefined
+    });
+}
+
 export function create_fetch({
     overrideOrigin,
     hostHeader,
@@ -96,7 +118,8 @@ export function create_fetch({
     } else if (hostHeader || protocolHeader) {
         resolvers.push((args) => override_origin_with_header(args, hostHeader, protocolHeader));
     }
-    resolvers.push(({ request }) => serve_static(request, basePath));
+    resolvers.push(({ request }) => serve(join(basePath, '/client'), true)?.(request));
+    resolvers.push(({ request }) => serve(join(basePath, '/prerender'))?.(request));
     return (request: Request, srv: Server) => {
         const request_ip = srv.requestIP(request)?.address;
         const try_get_ip = getIp ? () => getIp(request, request_ip) : () => request_ip;
