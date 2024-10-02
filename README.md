@@ -1,32 +1,19 @@
-# @eslym/sveltekit-adapter-bun
+# @chtibizoux/sveltekit-adapter-bun
 
 Another sveltekit adapter for bun, an alternative to [svelte-adapter-bun](https://github.com/gornostay25/svelte-adapter-bun). This package support websocket in dev mode with few steps of setup.
 
 ## Installation
 
 ```shell
-bun add -d @eslym/sveltekit-adapter-bun
+bun add -d @chtibizoux/sveltekit-adapter-bun
 ```
 
-## Setup dev server
+## Start dev server
 
 > [!NOTE]  
-> You do not need to do this if you are not using websocket in dev mode.
+> You do not need to do this if you are not using websocket.
 
-1. Create an entrypoint file for dev server, e.g. `./dev.ts`
-2. Add the following code to the entrypoint file
-    ```typescript
-    import { patchSvelteKit, startDevServer } from '@eslym/sveltekit-adapter-bun';
-
-    await patchSvelteKit();
-    await startDevServer();
-    ```
-
-3. run `bun dev.ts`
-
-The `patchSvelteKit` function will patch the sveltekit using `bun patch` to let it get the original `Request` object from bun and pass it to the dev server, making `Bun.Server#upgrade` possible. The `startDevServer` function will start the dev server with websocket support.
-
-The `patchSvelteKit` will not impact anything in production build, since the production build will not involve `@sveltejs/kit/node` unless you are using it in your code.
+run `bun sveltekit-bun` to start a dev server
 
 > [!IMPORTANT]
 > This dev server uses bun's internal stuff, so it might break in the future bun version, but the
@@ -38,7 +25,7 @@ The `patchSvelteKit` will not impact anything in production build, since the pro
 // ./src/app.d.ts
 // for the type checking
 
-import type { AdapterPlatform } from '@eslym/sveltekit-adapter-bun';
+import type { AdapterPlatform } from '@chtibizoux/sveltekit-adapter-bun';
 
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
