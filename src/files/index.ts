@@ -1,9 +1,9 @@
-import './server';
+import type { WebSocketHandler as BunWSHandler } from 'bun';
 import cac from 'cac';
-import { set_basepath } from './utils';
 import type { ServeOptions, WebSocketHandler } from '../types';
 import { create_fetch } from './handle';
-import type { WebSocketHandler as BunWSHandler } from 'bun';
+import './server';
+import { set_basepath } from './utils';
 
 import { get_hooks } from 'SERVER';
 
@@ -19,6 +19,7 @@ cli.command('', 'Serve the app')
     .alias('serve')
     .option('--port, -p <port>', 'Port to listen on', { default: env.HTTP_PORT || 3000 })
     .option('--host, -h <host>', 'Host to listen on', { default: env.HTTP_HOST || '0.0.0.0' })
+    .option('--timeout <timeout>', 'Request timeout', { default: env.TIMEOUT })
     .option('--unix-socket, -u <unix-socket>', 'Serve on a unix socket instead.', {
         default: env.HTTP_SOCKET
     })
@@ -41,7 +42,8 @@ cli.command('', 'Serve the app')
               }
             : {
                   hostname: options.host,
-                  port: options.port
+                  port: options.port,
+                  idleTimeout: options.timeout
               };
         const server = Bun.serve({
             ...serverOptions,

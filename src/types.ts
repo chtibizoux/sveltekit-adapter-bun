@@ -12,6 +12,7 @@ export type ServeOptions = {
     port: number;
     host: string;
     unixSocket?: string;
+    timeout?: number;
 } & CreateFetchOptions;
 
 export type WebSocketOptions = Omit<

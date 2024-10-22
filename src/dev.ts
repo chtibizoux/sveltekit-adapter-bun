@@ -1,9 +1,9 @@
-import { dirname, join } from 'path';
+import type { WebSocketHandler as BunWSHandler, Server } from 'bun';
 import { EventEmitter } from 'events';
 import { IncomingMessage, ServerResponse } from 'http';
-import type { Server, WebSocketHandler as BunWSHandler } from 'bun';
-import type { WebSocketHandler } from './types';
+import { dirname, join } from 'path';
 import { symServer, symUpgrades } from './symbols';
+import type { WebSocketHandler } from './types';
 
 const getRequestPatch = `
 	if(Symbol.for('::bunternal::') in request.socket) {
@@ -77,8 +77,9 @@ export async function patchSveltekit() {
 export async function startDevServer({
     port = 5173,
     host = 'localhost',
-    config
-}: { port?: number; host?: string; config?: string } = {}) {
+    config,
+    timeout
+}: { port?: number; host?: string; config?: string; timeout?: number } = {}) {
     if (!('Bun' in globalThis)) {
         throw new Error('Please run with bun');
     }
@@ -124,6 +125,7 @@ export async function startDevServer({
     await hooks.beforeServe?.();
 
     const server = Bun.serve({
+        idleTimeout: timeout,
         hostname: host,
         port,
         async fetch(request: Request, server: Server) {
