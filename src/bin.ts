@@ -1,4 +1,4 @@
-#! /usr/bin/env node
+#! /usr/bin/env bun
 import cac from 'cac';
 import { patchSveltekit, startDevServer } from './dev';
 
